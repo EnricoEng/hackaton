@@ -14,11 +14,17 @@ def identify_resources_and_providers(terraform_content):
         if resource_type.startswith("google"):
             provider=("GCP")
             #print(f"provider: {provider}")
+        elif resource_type.startswith("azure"):
+            provider=("Azure")
+        
+        elif resource_type.startswith("aws"):
+            provider=("AWS")
+
     
     return resources, provider
 
 # Read the content of the terraform file
-with open('main_example1.tf', 'r') as file:
+with open('one_webserver_azure_main_example.tf', 'r') as file:
     terraform_content = file.read()
 
 # Identify resources and provider
