@@ -23,15 +23,24 @@ def show_cloud_screen():
     # Cria um botão para voltar à tela anterior
     back_button = tk.Button(root, text="Voltar", command=show_main_screen, bg="gray", fg="white")
     back_button.pack(side=tk.LEFT, anchor=tk.SW, padx=10, pady=10)
+    
+
+
 
     # Cria um botão para fazer upload de arquivo
     upload_button = tk.Button(root, text="Upload de Arquivo", command=upload_file, bg="gray", fg="white")
-    upload_button.pack(pady=20)
+    upload_button.pack(pady=20, padx=20)
+   
     
     # Cria um botão para chamar uma API
     api_button = tk.Button(root, text="Chamar API", command=call_api, bg="gray", fg="white")
     api_button.pack(pady=20)
+    
 
+    # Cria uma caixa de texto para mostrar os outputs dos botões
+    global output_text
+    output_text = tk.Text(root, height=10, width=40, bg="blue", fg="white")
+    output_text.pack(pady=10)
 
 
 # Função para mostrar a tela principal
@@ -56,16 +65,20 @@ def show_main_screen():
 def upload_file():
     file_path = filedialog.askopenfilename()
     if file_path:
-        print(f"Arquivo selecionado: {file_path}")
+        #print(f"Arquivo selecionado: {file_path}")
+        output_text.insert(tk.END, f"Arquivo selecionado: {file_path}\n")
 
 # Função para chamar uma API
 def call_api():
     response = requests.get("https://api.exemplo.com/endpoint")
     if response.status_code == 200:
-        print("API chamada com sucesso!")
-        print(response.json())
+        #print("API chamada com sucesso!")
+        #print(response.json())
+        output_text.insert(tk.END, "API chamada com sucesso!\n")
+        output_text.insert(tk.END, f"{response.json()}\n")
     else:
-        print("Erro ao chamar a API")
+        output_text.insert(tk.END, "Erro ao chamar a API\n")
+        #print("Erro ao chamar a API")
 
 
 
