@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
+
+import requests
 
 # Função a ser chamada quando uma opção for selecionada
 def on_option_select():
@@ -21,6 +24,16 @@ def show_cloud_screen():
     back_button = tk.Button(root, text="Voltar", command=show_main_screen, bg="gray", fg="white")
     back_button.pack(side=tk.LEFT, anchor=tk.SW, padx=10, pady=10)
 
+    # Cria um botão para fazer upload de arquivo
+    upload_button = tk.Button(root, text="Upload de Arquivo", command=upload_file, bg="gray", fg="white")
+    upload_button.pack(pady=20)
+    
+    # Cria um botão para chamar uma API
+    api_button = tk.Button(root, text="Chamar API", command=call_api, bg="gray", fg="white")
+    api_button.pack(pady=20)
+
+
+
 # Função para mostrar a tela principal
 def show_main_screen():
     # Limpa a tela atual
@@ -28,7 +41,7 @@ def show_main_screen():
         widget.destroy()
     
     # Cria um rótulo com fonte e cor personalizadas
-    label = tk.Label(root, text="Escolha seu projeto", font=("Helvetica", 16), fg="black", bg="white")
+    label = tk.Label(root, text="Escolha seu projeto", font=("Helvetica", 22), fg="black", bg="white")
     label.pack(pady=20)
 
     # Cria botões de rádio para as opções com o novo estilo
@@ -36,6 +49,25 @@ def show_main_screen():
     for option in options:
         radio_button = ttk.Radiobutton(root, text=option, variable=option_var, value=option, command=on_option_select, style="TRadiobutton")
         radio_button.pack(anchor=tk.W, padx=20, pady=45)
+
+
+
+    # Função para fazer upload de arquivo
+def upload_file():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        print(f"Arquivo selecionado: {file_path}")
+
+# Função para chamar uma API
+def call_api():
+    response = requests.get("https://api.exemplo.com/endpoint")
+    if response.status_code == 200:
+        print("API chamada com sucesso!")
+        print(response.json())
+    else:
+        print("Erro ao chamar a API")
+
+
 
 # Cria a janela principal
 root = tk.Tk()
