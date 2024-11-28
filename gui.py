@@ -1,3 +1,4 @@
+import json
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -39,7 +40,7 @@ def show_cloud_screen():
 
     # Cria uma caixa de texto para mostrar os outputs dos botões
     global output_text
-    output_text = tk.Text(root, height=10, width=40, bg="blue", fg="white")
+    output_text = tk.Text(root, height=145, width=145, bg="blue", fg="white")
     output_text.pack(pady=10)
 
 
@@ -70,22 +71,33 @@ def upload_file():
 
 # Função para chamar uma API
 def call_api():
-    response = requests.get("https://api.exemplo.com/endpoint")
+    
+    url = "http://127.0.0.1:5000/generate_scenario"
+    headers = {"Content-Type": "application/json"}
+    data = {"provider": "AWS", "service": "S3 Bucket"}
+    
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    print(response.text)
+    
+    
     if response.status_code == 200:
-        #print("API chamada com sucesso!")
-        #print(response.json())
-        output_text.insert(tk.END, "API chamada com sucesso!\n")
-        output_text.insert(tk.END, f"{response.json()}\n")
+        #try:
+        #    response_json = response.json()
+          #  output_text.insert(tk.END, "API chamada com sucesso!\n")
+         #   output_text.insert(tk.END, f"{response_json}\n")
+        #except json.JSONDecodeError:
+            output_text.insert(tk.END, "API chamada com sucesso! (Resposta não é JSON)\n")
+            output_text.insert(tk.END, f"{response.text}\n")
     else:
-        output_text.insert(tk.END, "Erro ao chamar a API\n")
-        #print("Erro ao chamar a API")
+        output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
+        output_text.insert(tk.END, f"{response.text}\n")
 
 
 
 # Cria a janela principal
 root = tk.Tk()
 root.title("Escolha seu projeto")
-root.geometry("800x600")  # Define o tamanho da janela
+root.geometry("1290x800")  # Define o tamanho da janela
 root.configure(bg="white")  # Define a cor de fundo da janela
 
 # Cria uma variável para armazenar a opção selecionada
