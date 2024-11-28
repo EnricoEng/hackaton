@@ -1,5 +1,7 @@
 import re
 
+
+
 def identify_resources_and_providers(terraform_content):
     # Regular expression to find resource blocks
     resource_pattern = r'resource\s+"(\w+)"\s+"(\w+)"'
@@ -24,17 +26,21 @@ def identify_resources_and_providers(terraform_content):
     return resources, provider
 
 # Read the content of the terraform file
-with open('one_webserver_azure_main_example.tf', 'r') as file:
-    terraform_content = file.read()
+def readTerraformFile(arquivo):
+    with open(arquivo, 'r') as file:
+        terraform_content = file.read()
+        return terraform_content
 
 # Identify resources and provider
-resources, provider = identify_resources_and_providers(terraform_content)
+#resources, provider = identify_resources_and_providers(terraform_content) 
 
 # Print the identified resources
-print("Resources:")
-for resource_type, resource_name in resources:
-    print(f"Resource Type: {resource_type}, Resource Name: {resource_name}")
+def printResources():
+    print("Resources:")
+    for resource_type, resource_name in resources:
+        print(f"Resource Type: {resource_type}, Resource Name: {resource_name}")
 
 # Print the identified provider
-print("\nProviders:")
-print(f"Provider: {provider}")
+def printProviders(): 
+    print("\nProviders:")
+    print(f"Provider: {provider}")

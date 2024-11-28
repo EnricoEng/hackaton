@@ -5,6 +5,8 @@ from tkinter import filedialog
 
 import requests
 
+import identify_Resource_Provider
+
 # Função a ser chamada quando uma opção for selecionada
 def on_option_select():
     selected_option = option_var.get()
@@ -68,6 +70,19 @@ def upload_file():
     if file_path:
         #print(f"Arquivo selecionado: {file_path}")
         output_text.insert(tk.END, f"Arquivo selecionado: {file_path}\n")
+        
+        #file_name = os.path.basename(file_path)
+        #output_text.insert(tk.END, f"Arquivo selecionado: {file_name}\n")
+
+        terraform_content = identify_Resource_Provider.readTerraformFile(file_path)
+        resources, provider = identify_Resource_Provider.identify_resources_and_providers(terraform_content) 
+        
+        output_text.insert(tk.END, "Resources:\n")
+        for resource_type, resource_name in resources:
+            output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
+
+        output_text.insert(tk.END, f"Provider: {provider}\n")
+
 
 # Função para chamar uma API
 def call_api():
