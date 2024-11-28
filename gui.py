@@ -62,11 +62,15 @@ def show_main_screen():
         radio_button = ttk.Radiobutton(root, text=option, variable=option_var, value=option, command=on_option_select, style="TRadiobutton")
         radio_button.pack(anchor=tk.W, padx=20, pady=45)
 
-Provider = ""
+#Provider = ""
 resourceType = ""
 
     # Função para fazer upload de arquivo
 def upload_file():
+    
+    global Provider
+    global resourceType
+
     file_path = filedialog.askopenfilename()
     if file_path:
         #print(f"Arquivo selecionado: {file_path}")
@@ -82,9 +86,12 @@ def upload_file():
         for resource_type, resource_name in resources:
             output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
             resourceType = resource_type
+        
+        print(resourceType)
 
         output_text.insert(tk.END, f"Provider: {provider}\n")
         Provider = provider
+        print(Provider)
 
 
 
@@ -94,7 +101,7 @@ def call_api():
     
     url = "http://127.0.0.1:5000/generate_scenario"
     headers = {"Content-Type": "application/json"}
-    data = {"provider": Provider, "service": "S3 Bucket"}
+    data = {"provider": Provider, "service": resourceType}
     #data = {"provider": Provider, "Service": resourceType, "Resource": resourceType}
     #data = {"provider": "AWS", "service": "S3 Bucket"}
     
