@@ -6,6 +6,8 @@ import requests
 import hashlib  # Usado para simular a verificação de hash de arquivo de BIOS
 import identify_Resource_Provider
 
+import time
+
 # Função a ser chamada quando uma opção for selecionada
 def on_option_select():
     selected_option = option_var.get()
@@ -116,12 +118,13 @@ def on_option_select(option):
     elif option == "Hardware":
         show_hardware_screen()  # Exibe a tela de "Hardware"
 
-Provider = ""
-resourceType = ""
+
 
 # Função para fazer upload de arquivo
 def upload_file():
-    global Provider  # Use the global variable 'Provider'
+    
+    global provider
+    global resources
 
     file_path = filedialog.askopenfilename()
     if file_path:
@@ -133,26 +136,37 @@ def upload_file():
         output_text.insert(tk.END, "Resources:\n")
         for resource_type, resource_name in resources:
             output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
-            resourceType = resource_type
 
         output_text.insert(tk.END, f"Provider: {provider}\n")
-        Provider = provider
+     
+
 
 # Função para chamar uma API
 def call_api():
-    url = "http://127.0.0.1:5000/generate_scenario"
-    headers = {"Content-Type": "application/json"}
-    data = {"provider": Provider, "service": "S3 Bucket"}
+    for resource_type in resources:    
+        url = "http://127.0.0.1:5000/generate_scenario"
+        headers = {"Content-Type": "application/json"}
+        data = {"provider": provider, "resource": resource_type}
+        #data = {"provider": Provider, "Service": resourceType, "Resource": resourceType}
+        #data = {"provider": "AWS", "service": "S3 Bucket"}
     
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    print(response.text)
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        print(response.text)
     
-    if response.status_code == 200:
-        output_text.insert(tk.END, "API chamada com sucesso!\n")
-        output_text.insert(tk.END, f"{response.text}\n")
-    else:
-        output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
-        output_text.insert(tk.END, f"{response.text}\n")
+        if response.status_code == 200:
+            #try:
+
+            #    response_json = response.json()
+              #  output_text.insert(tk.END, "API chamada com sucesso!\n")
+             #   output_text.insert(tk.END, f"{response_json}\n")
+            #except json.JSONDecodeError:
+            output_text.insert(tk.END, "API chamada com sucesso! (Resposta não é JSON)\n")
+            output_text.insert(tk.END, f"{response.text}\n")
+        else:
+            output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
+            output_text.insert(tk.END, f"{response.text}\n")
+        
+
 
 # Cria a janela principal
 root = tk.Tk()
