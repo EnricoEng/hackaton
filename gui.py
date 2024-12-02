@@ -7,6 +7,8 @@ import requests
 
 import identify_Resource_Provider
 
+import time
+
 # Função a ser chamada quando uma opção for selecionada
 def on_option_select():
     selected_option = option_var.get()
@@ -62,14 +64,13 @@ def show_main_screen():
         radio_button = ttk.Radiobutton(root, text=option, variable=option_var, value=option, command=on_option_select, style="TRadiobutton")
         radio_button.pack(anchor=tk.W, padx=20, pady=45)
 
-#Provider = ""
-resourceType = ""
+
 
     # Função para fazer upload de arquivo
 def upload_file():
     
-    global Provider
-    global resourceType
+    global provider
+    global resources
 
     file_path = filedialog.askopenfilename()
     if file_path:
@@ -85,41 +86,43 @@ def upload_file():
         output_text.insert(tk.END, "Resources:\n")
         for resource_type, resource_name in resources:
             output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
-            resourceType = resource_type
-        
-        print(resourceType)
+            
+        print(type(resources))
+        print(resources)    
+           
 
         output_text.insert(tk.END, f"Provider: {provider}\n")
-        Provider = provider
-        print(Provider)
+        print(type(provider))
+        print(provider)
 
 
 
 
 # Função para chamar uma API
 def call_api():
+    for resource_type in resources:    
+        url = "http://127.0.0.1:5000/generate_scenario"
+        headers = {"Content-Type": "application/json"}
+        data = {"provider": provider, "resource": resource_type}
+        #data = {"provider": Provider, "Service": resourceType, "Resource": resourceType}
+        #data = {"provider": "AWS", "service": "S3 Bucket"}
     
-    url = "http://127.0.0.1:5000/generate_scenario"
-    headers = {"Content-Type": "application/json"}
-    data = {"provider": Provider, "service": resourceType}
-    #data = {"provider": Provider, "Service": resourceType, "Resource": resourceType}
-    #data = {"provider": "AWS", "service": "S3 Bucket"}
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        print(response.text)
     
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    print(response.text)
-    
-    
-    if response.status_code == 200:
-        #try:
-        #    response_json = response.json()
-          #  output_text.insert(tk.END, "API chamada com sucesso!\n")
-         #   output_text.insert(tk.END, f"{response_json}\n")
-        #except json.JSONDecodeError:
+        if response.status_code == 200:
+            #try:
+
+            #    response_json = response.json()
+              #  output_text.insert(tk.END, "API chamada com sucesso!\n")
+             #   output_text.insert(tk.END, f"{response_json}\n")
+            #except json.JSONDecodeError:
             output_text.insert(tk.END, "API chamada com sucesso! (Resposta não é JSON)\n")
             output_text.insert(tk.END, f"{response.text}\n")
-    else:
-        output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
-        output_text.insert(tk.END, f"{response.text}\n")
+        else:
+            output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
+            output_text.insert(tk.END, f"{response.text}\n")
+        
 
 
 
