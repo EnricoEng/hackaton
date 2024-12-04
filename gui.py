@@ -23,7 +23,7 @@ def show_cloud_screen():
     
     # Criar um novo label para a tela Cloud com um estilo moderno
     cloud_label = tk.Label(root, text="Welcome to the Cloud Screen", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
-    cloud_label.pack(pady=30)
+    cloud_label.pack(pady=10)
     
     # Botão de voltar
     back_button = ttk.Button(root, text="Back", style="TButton", command=show_main_screen)
@@ -31,23 +31,26 @@ def show_cloud_screen():
 
     # Criar o frame para os botões
     button_frame = tk.Frame(root, bg=root.cget("bg"))  # Define a cor de fundo para coincidir com a janela principal
-    button_frame.pack(pady=30)
+    button_frame.pack(pady=10)
 
     # Botão para upload de arquivo
+    global upload_button  # Torna o botão global para acesso em outras funções
     upload_button = tk.Button(button_frame, text="Upload File", command=upload_file, bg="#27ae60", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2ecc71")
-    upload_button.pack(side=tk.LEFT, padx=10)
+    upload_button.pack(side=tk.LEFT, padx=5)
 
-    # Botão para chamar a API
-    api_button = tk.Button(button_frame, text="Generate Test Scenarios", command=call_api, bg="#e74c3c", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#c0392b")
-    api_button.pack(side=tk.LEFT, padx=10)
+    # Botão para chamar a API (desabilitado inicialmente)
+    global api_button  # Torna o botão global
+    api_button = tk.Button(button_frame, text="Generate Test Scenarios", command=call_api, state="disabled", bg="#3498db", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2b6b96")
+    api_button.pack(side=tk.LEFT, padx=5)
 
-    # Botão para chamar a API Rag
-    api_rag_button = tk.Button(button_frame, text="Generate Test Scenarios using RAG", command=call_api_rag, bg="#9b59b6", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#8e44ad")
-    api_rag_button.pack(side=tk.LEFT, padx=10)
+    # Botão para chamar a API Rag (desabilitado inicialmente)
+    global api_rag_button  # Torna o botão global
+    api_rag_button = tk.Button(button_frame, text="Generate Test Scenarios using RAG", command=call_api_rag, state="disabled", bg="#3498db", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2b6b96")
+    api_rag_button.pack(side=tk.LEFT, padx=5)
 
     # Aumentar o tamanho da caixa de texto para exibir os resultados dos botões
     global output_text
-    output_text = tk.Text(root, height=25, width=105, bg="#2c3e50", fg="white", font=("Courier New", 12), relief="flat", bd=0, padx=10, pady=10)
+    output_text = tk.Text(root, height=30, width=150, bg="#2c3e50", fg="white", font=("Courier New", 12), relief="flat", bd=0, padx=10, pady=0)
     output_text.pack(pady=10, padx=20)
 
     # Botão para download do output
@@ -147,6 +150,13 @@ def upload_file():
             output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
 
         output_text.insert(tk.END, f"Provider: {provider}\n")
+
+                # Muda a cor do botão para cinza após a seleção do arquivo
+        upload_button.config(bg="gray", activebackground="gray")
+
+        # Habilita os botões "Generate" após a seleção do arquivo
+        api_button.config(state="normal")
+        api_rag_button.config(state="normal")
 
 # Função para chamar a API
 def call_api():
