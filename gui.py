@@ -3,78 +3,90 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import requests
-import hashlib  # Usado para simular a verificação de hash de arquivo de BIOS
+import hashlib  # Usado para simular a verificação de hash de firmware BIOS
 import identify_Resource_Provider
 
 import time
 
-# Função a ser chamada quando uma opção for selecionada
+# Função para ser chamada quando uma opção for selecionada
 def on_option_select():
     selected_option = option_var.get()
     if selected_option == "Cloud":
         show_cloud_screen()
-    elif selected_option == "Hardware":
-        show_hardware_screen()
+        show_firmware_screen()
 
-# Função para mostrar a tela de Cloud
+# Função para mostrar a tela Cloud
 def show_cloud_screen():
-    # Limpa a tela atual
+    # Limpar a tela atual
     for widget in root.winfo_children():
         widget.destroy()
     
-    # Cria um novo rótulo para a tela de Cloud com um estilo mais moderno
-    cloud_label = tk.Label(root, text="Bem-vindo à tela de Cloud", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
+    # Criar um novo label para a tela Cloud com um estilo moderno
+    cloud_label = tk.Label(root, text="Welcome to the Cloud Screen", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
     cloud_label.pack(pady=30)
     
-    # Cria um botão para voltar à tela anterior com um estilo diferenciado
-    back_button = tk.Button(root, text="Voltar", command=show_main_screen, bg="#2980b9", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#3498db")
-    back_button.pack(side=tk.LEFT, anchor=tk.SW, padx=20, pady=20)
+    # Botão de voltar
+    back_button = ttk.Button(root, text="Back", style="TButton", command=show_main_screen)
+    back_button.place(x=20, y=20)  # Posicionar o botão 10 pixels da esquerda e 10 pixels de cima
 
-    # Cria um botão para fazer upload de arquivo com estilo melhorado
-    upload_button = tk.Button(root, text="Upload de Arquivo", command=upload_file, bg="#27ae60", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2ecc71")
-    upload_button.pack(pady=30, padx=20) 
-    
-    # Cria um botão para chamar uma API com estilo diferenciado
-    api_button = tk.Button(root, text="Chamar API", command=call_api, bg="#e74c3c", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#c0392b")
-    api_button.pack(pady=30)
-    
-    # Aumenta o tamanho da caixa de texto para mostrar os outputs dos botões
+    # Criar o frame para os botões
+    button_frame = tk.Frame(root, bg=root.cget("bg"))  # Define a cor de fundo para coincidir com a janela principal
+    button_frame.pack(pady=30)
+
+    # Botão para upload de arquivo
+    upload_button = tk.Button(button_frame, text="Upload File", command=upload_file, bg="#27ae60", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2ecc71")
+    upload_button.pack(side=tk.LEFT, padx=10)
+
+    # Botão para chamar a API
+    api_button = tk.Button(button_frame, text="Generate Test Scenarios", command=call_api, bg="#e74c3c", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#c0392b")
+    api_button.pack(side=tk.LEFT, padx=10)
+
+    # Botão para chamar a API Rag
+    api_rag_button = tk.Button(button_frame, text="Generate Test Scenarios using RAG", command=call_api_rag, bg="#9b59b6", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#8e44ad")
+    api_rag_button.pack(side=tk.LEFT, padx=10)
+
+    # Aumentar o tamanho da caixa de texto para exibir os resultados dos botões
     global output_text
-    output_text = tk.Text(root, height=20, width=80, bg="#2c3e50", fg="white", font=("Courier New", 12), relief="flat", bd=0, padx=10, pady=10)
+    output_text = tk.Text(root, height=25, width=105, bg="#2c3e50", fg="white", font=("Courier New", 12), relief="flat", bd=0, padx=10, pady=10)
     output_text.pack(pady=10, padx=20)
 
-# Função para mostrar a tela de "Hardware"
-def show_hardware_screen():
+    # Botão para download do output
+    download_button = tk.Button(root, text="Download Output", command=download_output, bg="#3498db", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#2980b9")
+    download_button.pack(pady=10)
+
+# Função para chamar a API Rag
+def call_api_rag():
+    # Função exemplo para simular o que seria chamado
+    output_text.insert(tk.END, "Calling API Rag...\n")
+
+# Função para mostrar a tela de Firmware
+def show_firmware_screen():
     for widget in root.winfo_children():
         widget.destroy()
     
-    label = tk.Label(root, text="Tela de Hardware", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
+    label = tk.Label(root, text="Firmware Screen", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
     label.pack(pady=30)
 
-    # Adiciona opções de verificação de integridade de BIOS
-    integrity_button = tk.Button(root, text="Verificar Integridade do Firmware (BIOS)", command=verify_firmware_integrity, bg="#f39c12", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#f1c40f")
+    # Adicionar opções de verificação de integridade do BIOS
+    integrity_button = tk.Button(root, text="EDK II C Coding Standards Specification", command=verify_firmware_integrity, bg="#f39c12", fg="white", font=("Arial", 14, "bold"), relief="flat", bd=0, padx=15, pady=8, activebackground="#f1c40f")
     integrity_button.pack(pady=30, padx=20)
 
-    # Botão para voltar
-    back_button = ttk.Button(root, text="Voltar", style="TButton", command=show_main_screen)
-    back_button.pack(pady=20)
+    # Botão de voltar
+    back_button = ttk.Button(root, text="Back", style="TButton", command=show_main_screen)
+    back_button.place(x=20, y=20)  # Posicionar o botão 10 pixels da esquerda e 10 pixels de cima
 
-# Função para simular a verificação de integridade de BIOS
+# Função para verificar a integridade do firmware BIOS
 def verify_firmware_integrity():
-    # Abrir um arquivo para simular a verificação de hash
-    file_path = filedialog.askopenfilename(title="Selecione o arquivo de firmware BIOS")
+    # Simulação de verificação de hash (usando um hash pré-definido para comparação)
+    file_path = filedialog.askopenfilename(title="Select BIOS Firmware File")
     if file_path:
-        # Simulando a verificação de hash (usaremos um hash pré-definido para comparar)
-        predefined_hash = "d2d2d2f4e5a5646f2d2e1e6f59a8be77"  # Exemplo de hash fictício
-        
-        # Calcular o hash do arquivo selecionado
+        predefined_hash = "d2d2d2f4e5a5646f2d2e1e6f59a8be77"  # Exemplo de hash
         file_hash = calculate_file_hash(file_path)
-
-        output_text.insert(tk.END, f"Verificando integridade de: {file_path}\n")
+        output_text.insert(tk.END, f"Verifying integrity of: {file_path}\n")
         if file_hash == predefined_hash:
-            output_text.insert(tk.END, "A integridade do firmware foi verificada com sucesso! (Hash corresponde)\n")
+            output_text.insert(tk.END, "Firmware integrity verified successfully! (Hash matches)\n")
         else:
-            output_text.insert(tk.END, "Falha na verificação de integridade. (Hash não corresponde)\n")
+            output_text.insert(tk.END, "Integrity check failed. (Hash does not match)\n")
 
 # Função para calcular o hash de um arquivo
 def calculate_file_hash(file_path):
@@ -86,15 +98,15 @@ def calculate_file_hash(file_path):
 
 # Função para mostrar a tela principal
 def show_main_screen():
-    # Limpa a tela atual
+    # Limpar a tela atual
     for widget in root.winfo_children():
         widget.destroy()
 
-    # Cria um rótulo com um estilo mais moderno
-    label = tk.Label(root, text="Escolha seu projeto", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
+    # Criar um label com estilo moderno
+    label = tk.Label(root, text="Choose Your Project", font=("Arial", 24, "bold"), fg="#2c3e50", bg="#ecf0f1")
     label.pack(pady=30)
 
-    # Define o estilo para os botões
+    # Definir o estilo para os botões
     style = ttk.Style()
     style.configure("TButton",
                     font=("Arial", 14, "bold"),
@@ -105,30 +117,27 @@ def show_main_screen():
     style.map("TButton",
               background=[('active', '#2980b9'), ('pressed', '#1f4e79')])  # Efeito ao passar o mouse
 
-    # Cria os botões de seleção com o novo estilo
-    options = ["Cloud", "Hardware"]
+    # Criar botões de seleção com o novo estilo
+    options = ["Cloud", "Firmware"]
     for option in options:
         button = ttk.Button(root, text=option, style="TButton", command=lambda opt=option: on_option_select(opt))
         button.pack(pady=15, padx=10)
 
-# Função que será chamada quando um botão for selecionado
+# Função chamada quando um botão é selecionado
 def on_option_select(option):
     if option == "Cloud":
-        show_cloud_screen()  # Exibe a tela de "Cloud"
-    elif option == "Hardware":
-        show_hardware_screen()  # Exibe a tela de "Hardware"
+        show_cloud_screen()  # Exibe a tela "Cloud"
+    elif option == "Firmware":
+        show_firmware_screen()  # Exibe a tela "Firmware"
 
-
-
-# Função para fazer upload de arquivo
+# Função para upload de arquivo
 def upload_file():
-    
     global provider
     global resources
 
     file_path = filedialog.askopenfilename()
     if file_path:
-        output_text.insert(tk.END, f"Arquivo selecionado: {file_path}\n")
+        output_text.insert(tk.END, f"Selected file: {file_path}\n")
 
         terraform_content = identify_Resource_Provider.readTerraformFile(file_path)
         resources, provider = identify_Resource_Provider.identify_resources_and_providers(terraform_content) 
@@ -138,56 +147,55 @@ def upload_file():
             output_text.insert(tk.END, f"Resource Type: {resource_type}, Resource Name: {resource_name}\n")
 
         output_text.insert(tk.END, f"Provider: {provider}\n")
-     
 
-
-# Função para chamar uma API
+# Função para chamar a API
 def call_api():
     for resource_type in resources:    
         url = "http://127.0.0.1:5000/generate_scenario"
         headers = {"Content-Type": "application/json"}
         data = {"provider": provider, "resource": resource_type}
-        #data = {"provider": Provider, "Service": resourceType, "Resource": resourceType}
-        #data = {"provider": "AWS", "service": "S3 Bucket"}
     
         response = requests.post(url, headers=headers, data=json.dumps(data))
-        print(response.text)
     
         if response.status_code == 200:
-            #try:
-
-            #    response_json = response.json()
-              #  output_text.insert(tk.END, "API chamada com sucesso!\n")
-             #   output_text.insert(tk.END, f"{response_json}\n")
-            #except json.JSONDecodeError:
-            output_text.insert(tk.END, "API chamada com sucesso! (Resposta não é JSON)\n")
+            output_text.insert(tk.END, "API called successfully! (Response is not JSON)\n")
             output_text.insert(tk.END, f"{response.text}\n")
         else:
-            output_text.insert(tk.END, f"Erro ao chamar a API: {response.status_code}\n")
+            output_text.insert(tk.END, f"Error calling the API: {response.status_code}\n")
             output_text.insert(tk.END, f"{response.text}\n")
-        
 
+# Função para download do conteúdo da Text widget
+def download_output():
+    # Obter o conteúdo da Text widget
+    output_content = output_text.get(1.0, tk.END)
 
-# Cria a janela principal
+    # Perguntar onde salvar o arquivo
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
+    if file_path:
+        with open(file_path, "w") as file:
+            file.write(output_content)
+        output_text.insert(tk.END, f"Output saved to {file_path}\n")
+
+# Criar a janela principal
 root = tk.Tk()
 root.title("The Wall CyberSec Solutions")
-root.geometry("1290x800")  # Define o tamanho inicial da janela
-root.configure(bg="#ecf0f1")  # Cor de fundo suave e moderna
+root.geometry("1290x800")  # Definir tamanho inicial da janela
+root.configure(bg="#ecf0f1")  # Cor de fundo moderna e clara
 
-# Tornar a janela responsiva configurando o peso das linhas e colunas
-root.grid_rowconfigure(0, weight=1, minsize=50)  # A linha 0 vai se expandir, com um tamanho mínimo
-root.grid_rowconfigure(1, weight=1, minsize=50)  # A linha 1 vai se expandir
-root.grid_columnconfigure(0, weight=1, minsize=200)  # A coluna 0 vai se expandir, com um tamanho mínimo
+# Tornar a janela responsiva configurando os pesos das linhas e colunas
+root.grid_rowconfigure(0, weight=1, minsize=50)  # A linha 0 expande, com tamanho mínimo
+root.grid_rowconfigure(1, weight=1, minsize=50)  # A linha 1 expande
+root.grid_columnconfigure(0, weight=1, minsize=200)  # A coluna 0 expande, com tamanho mínimo
 
-# Cria uma variável para armazenar a opção selecionada
+# Criar a variável para armazenar a opção selecionada
 option_var = tk.StringVar()
 
-# Estilo para botões de rádio
+# Estilo para os botões de rádio
 style = ttk.Style()
 style.configure("TRadiobutton", font=("Arial", 16), background="#ecf0f1", foreground="#2c3e50", padding=10)
 
-# Mostra a tela principal ao iniciar a aplicação
+# Exibir a tela principal ao iniciar o app
 show_main_screen()
 
-# Executa a aplicação
+# Rodar o aplicativo
 root.mainloop()
