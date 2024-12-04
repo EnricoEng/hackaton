@@ -7,70 +7,58 @@ API called successfully! (Response is not JSON)
 Feature: Secure AWS EC2 Instance Configuration (ubuntu)
 
   Scenario: Preventing Publicly Accessible Instances
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And the instance has a public IP assigned
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And the `aws_instance` resource has a public IP assigned via `associate_public_ip_address = true`
     When the Terraform configuration is applied
-    Then the instance should not be publicly accessible (i.e., the security group should not allow inbound SSH from 0.0.0.0/0)
-    And the instance should have a security group associated with it that only allows SSH from approved IP addresses or CIDR blocks.
+    Then the deployment should fail with an error message indicating that public IP association is disallowed.
+    And the `aws_instance` resource should not be created with a public IP address.
 
 
-  Scenario: Enforcing SSH Key Authentication
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And the instance is configured with a user data script
+  Scenario: Enforcing SSH Key-Based Authentication
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And the `aws_instance` resource has a user data script that sets a password for the user
     When the Terraform configuration is applied
-    Then the instance should be configured to only allow SSH key-based authentication.
-    And the instance should not allow password authentication.
+    Then the deployment should fail with an error message indicating that password authentication is disallowed.
+    And the `aws_instance` resource should not be created with a password set.
+    And the `aws_instance` resource should be configured to use SSH key authentication.
 
 
-  Scenario: Ensuring Instance Metadata Service (IMDS) Security
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
+  Scenario: Ensuring Security Group Restrictions
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And a security group allowing inbound traffic on all ports from anywhere
     When the Terraform configuration is applied
-    Then the instance should have IMDSv2 enabled.
-    And the instance should have IMDSv2 restricted to the instance's private IP address.
+    Then the deployment should fail with an error message indicating that the security group is too permissive.
+    And the `aws_instance` resource should be associated with a security group that only allows SSH traffic on port 22 from specific IP addresses or CIDR blocks.
 
 
-  Scenario: Managing Security Group Rules Effectively
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And a security group is associated with the instance
+  Scenario: Preventing Root Access via SSH
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And the `aws_instance` resource allows SSH access using the root user
     When the Terraform configuration is applied
-    Then the security group should only allow necessary inbound traffic (e.g., SSH, HTTP/HTTPS if required).
-    And the security group should have explicit outbound rules, not relying on default allow all.
-    And all security group rules should be explicitly defined in the Terraform configuration, avoiding implicit rules.
+    Then the deployment should fail with an error message indicating that root SSH access is disallowed.
+    And the `aws_instance` resource should be configured to use a non-root user for SSH access.
 
 
-  Scenario: Using Dedicated Security Groups
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
+  Scenario: Implementing Instance Metadata Service (IMDS) v2 with Strict Endpoint Restrictions
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And the `aws_instance` resource is configured with IMDSv1
     When the Terraform configuration is applied
-    Then the instance should be associated with a dedicated security group, not sharing a security group with other instances or resources unless absolutely necessary.
+    Then the deployment should fail with an error message indicating that IMDSv1 is disallowed.
+    And the `aws_instance` resource should be configured with IMDSv2 and strict endpoint restrictions.
 
 
-  Scenario: Regular Security Patches
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And the instance is configured with user data to install updates
-    When the Terraform configuration is applied and the instance boots
-    Then the instance should automatically install security updates upon boot.
-    And the instance should be configured for automatic security updates.
-
-
-  Scenario: Preventing Root Login
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And a non-root user is created
+  Scenario:  Using Instance Profiles for IAM Roles instead of inline credentials
+    Given an AWS account with Terraform configured
+    And a Terraform configuration defining an `aws_instance` resource with `ami` containing "ubuntu"
+    And the `aws_instance` resource has inline IAM credentials defined
     When the Terraform configuration is applied
-    Then root login should be disabled.
-    And the instance should only allow SSH login for the specified non-root user.
-
-
-  Scenario:  EBS Volume Encryption
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    And an EBS volume is attached to the instance
-    When the Terraform configuration is applied
-    Then the EBS volume should be encrypted using AWS KMS.
-
-
-  Scenario:  Instance Metadata Options
-    Given an AWS infrastructure defined using Terraform with an "aws_instance" resource using an "ubuntu" AMI
-    When the Terraform configuration is applied
-    Then the instance should have `instance_metadata_options` set to restrict access to the instance metadata service.
+    Then the deployment should fail with an error message indicating that inline credentials are disallowed.
+    And the `aws_instance` resource should be associated with an IAM instance profile.
 
 ```
 

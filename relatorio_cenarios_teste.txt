@@ -1,0 +1,206 @@
+Selected file: /home/user/Downloads/hackaton/main_example1.tf
+Resources:
+Resource Type: google_compute_autoscaler, Resource Name: default
+Resource Type: google_compute_instance_template, Resource Name: default
+Resource Type: google_compute_instance_group_manager, Resource Name: default
+Provider: GCP
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Autoscaler Configuration
+
+  Scenario: Preventing Autoscaler from Creating Instances with Insecure Metadata
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured to use a template with metadata including a sensitive key "secret-key"
+    When the Terraform configuration is applied
+    Then the autoscaler should NOT create instances with the "secret-key" metadata exposed.
+    And the Terraform plan should show a warning or error if "secret-key" is included in the metadata.
+
+
+  Scenario: Ensuring Autoscaler Uses Appropriate Service Accounts with Limited Permissions
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured to use a service account "my-service-account"
+    When the Terraform configuration is applied
+    Then the autoscaler should use the service account "my-service-account" with only necessary permissions (e.g., compute.instances.create, compute.autoscalers.get)
+    And the service account should NOT have broader permissions like "storage.admin" or "iam.serviceAccountAdmin".
+
+
+  Scenario: Preventing Autoscaler from Scaling to an Excessively Large Number of Instances
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured with a maximum number of instances set to 1000
+    When the Terraform configuration is applied
+    Then the autoscaler should have a maximum number of instances significantly less than 1000 (e.g., a value appropriate for the application's needs, such as 10 or 20).
+    And the Terraform plan should include a comment or warning recommending a more restrictive maximum number of instances based on best practices.
+
+
+  Scenario: Verifying Autoscaler's Target Pool is Securely Configured
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler targets a google_compute_target_pool resource
+    When the Terraform configuration is applied
+    Then the target pool should be configured with appropriate security settings (e.g., HTTPS only, appropriate firewall rules).
+    And the Terraform plan should show the target pool's security settings.
+
+
+  Scenario:  Preventing Unintentional Deletion of Autoscaler Resources
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is part of a larger infrastructure deployment
+    When the Terraform configuration is destroyed
+    Then the autoscaler should be deleted gracefully and cleanly.
+    And dependent resources should be handled appropriately (e.g., instances should be stopped or deleted).
+    And the Terraform destroy process should not leave behind orphaned resources.
+
+
+  Scenario:  Using a Managed Instance Group with Appropriate Security Settings
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler targets a managed instance group
+    When the Terraform configuration is applied
+    Then the managed instance group should have appropriate security settings (e.g., properly configured firewall rules, OS hardening, minimal necessary software).
+    And the Terraform plan should reflect these security settings.
+
+
+  Scenario:  Monitoring Autoscaler Metrics for Security Events
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is integrated with a monitoring system (e.g., Cloud Monitoring)
+    When the Terraform configuration is applied
+    Then the monitoring system should be configured to collect relevant metrics for security analysis (e.g., instance creation rate, error rates).
+    And alerts should be configured to trigger on suspicious activity.
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Instance Template Configuration
+
+  Scenario: Preventing Publicly Accessible Instances
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And the network interface has a network specified
+    And the network interface has no accessConfigs specified
+    When the Terraform configuration is applied
+    Then the created instance template should not have any publicly accessible IP addresses.
+    And the instance template should only allow internal network access.
+
+
+  Scenario: Enforcing SSH Key Authentication Only
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And the metadata specifies a startup-script that installs SSH
+    And the metadata does NOT include a password for the default user
+    And the metadata includes a public SSH key
+    When the Terraform configuration is applied
+    Then the created instance template should only allow SSH key authentication.
+    And the created instance template should not allow password authentication.
+
+
+  Scenario: Ensuring OS Hardening with Startup Script
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And a startup script is specified in the metadata
+    And the startup script includes commands to update the OS, install security updates, and disable unnecessary services
+    When the Terraform configuration is applied
+    Then the instances created from the template should have the OS hardened according to the startup script.
+
+
+  Scenario: Preventing Unnecessary Metadata
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And the metadata includes only necessary information for instance operation (e.g., SSH keys, startup scripts)
+    When the Terraform configuration is applied
+    Then the created instance template should only contain the specified necessary metadata.
+    And no sensitive information should be included in the metadata.
+
+
+  Scenario: Using a Managed Service Account with Limited Permissions
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And a service account is specified for the instance
+    And the service account has only the necessary IAM permissions to function
+    When the Terraform configuration is applied
+    Then the created instance template should use the specified service account.
+    And the service account should have least privilege access.
+
+
+  Scenario: Configuring Appropriate Firewall Rules
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And the instance is associated with a firewall rule
+    And the firewall rule allows only necessary inbound and outbound traffic (e.g., SSH, HTTP, HTTPS)
+    When the Terraform configuration is applied
+    Then the created instance template should be protected by the specified firewall rules.
+    And the firewall rules should adhere to the principle of least privilege.
+
+
+  Scenario:  Disabling Unnecessary Services
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And a startup script is provided
+    And the startup script disables unnecessary services (e.g., telnet, ftp)
+    When the Terraform configuration is applied
+    Then the instances created from the template should have unnecessary services disabled.
+
+
+  Scenario:  Regular Security Image Updates
+    Given a Terraform configuration for a google_compute_instance_template resource named "default"
+    And a regularly updated security image is specified
+    When the Terraform configuration is applied
+    Then the created instances should use a regularly updated security image.
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Instance Group Manager Configuration
+
+  Scenario: Preventing Unintentional Public IP Assignment
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the instance template specifies network interfaces without specifying a network
+    When the Terraform configuration is applied
+    Then the instance group manager should NOT create instances with public IP addresses assigned automatically.
+    And the Terraform plan should explicitly show that no public IP addresses will be assigned.
+
+
+  Scenario: Enforcing HTTPS for Instance Group Manager Health Checks
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And a health check is defined using `google_compute_health_check`
+    And the health check protocol is HTTP
+    When the Terraform configuration is applied
+    Then the Terraform plan should report a warning or error indicating that the health check protocol should be HTTPS for enhanced security.
+    And the configuration should be rejected or updated to use HTTPS.
+
+
+  Scenario: Preventing Unrestricted Instance Group Manager Access
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the instance group manager is not associated with any firewall rules
+    When the Terraform configuration is applied
+    Then the Terraform plan should report a warning or error indicating that the instance group manager needs appropriate firewall rules to restrict access.
+    And the configuration should be rejected until appropriate firewall rules are defined.
+
+
+  Scenario: Ensuring Instance Group Manager uses Managed Instance Groups
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the `base_instance_name` is specified
+    When the Terraform configuration is applied
+    Then the instance group manager should be created as a managed instance group.
+    And the Terraform output should confirm the use of managed instance groups for better scalability and management.
+
+
+  Scenario: Verifying Instance Group Manager's Versioning and Rollouts
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And a rollout policy is defined with a minimal number of healthy instances
+    And a named instance template is used
+    When the Terraform configuration is applied
+    Then the instance group manager should use a versioning strategy that ensures minimal downtime during updates.
+    And the Terraform plan should clearly show the rollout policy and its parameters.
+    And the logs should indicate successful versioning and rollout.
+
+
+  Scenario:  Preventing the use of deprecated instance templates
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And an instance template is specified using a deprecated version
+    When the Terraform configuration is applied
+    Then the Terraform plan should report a warning or error indicating the use of a deprecated instance template.
+    And the configuration should be rejected or updated to use a supported instance template.
+
+
+  Scenario:  Validating Instance Group Manager's Autohealing Configuration
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And autohealing is enabled
+    When the Terraform configuration is applied
+    Then the instance group manager should have autohealing enabled with appropriate health checks.
+    And the Terraform plan should clearly show the autohealing configuration.
+
+```
+
+
