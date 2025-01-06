@@ -1,0 +1,291 @@
+Selected file: /home/enrico/Documents/hackaton/main_example1.tf
+Resources:
+Resource Type: google_compute_autoscaler, Resource Name: default
+Resource Type: google_compute_instance_template, Resource Name: default
+Resource Type: google_compute_instance_group_manager, Resource Name: default
+Provider: GCP
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Autoscaler Configuration
+
+  Scenario: Preventing Autoscaler from Creating Instances with Insecure Metadata
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured to use a template with metadata including sensitive information like API keys
+    When the Terraform configuration is applied
+    Then the autoscaler should NOT create instances with the sensitive metadata exposed in the metadata section.
+    And the Terraform plan should highlight a warning or error if sensitive metadata is detected.
+
+
+  Scenario: Ensuring Autoscaler Uses Appropriate Service Accounts with Limited Permissions
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured with a service account
+    When the Terraform configuration is applied
+    Then the autoscaler should use a service account with only the necessary permissions to manage instances.
+    And the service account should NOT have broader permissions like storage admin or network admin.
+    And the Terraform plan should explicitly list the granted permissions for the service account.
+
+
+  Scenario: Preventing Autoscaler from Scaling to an Excessively Large Number of Instances
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler is configured with a maximum number of instances
+    When the Terraform configuration is applied
+    Then the autoscaler should NOT scale beyond the defined maximum number of instances, even under high load.
+    And the Terraform configuration should include clear documentation explaining the rationale behind the maximum instance limit.
+
+
+  Scenario: Verifying Autoscaler's Target Pool is Securely Configured
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler targets a google_compute_target_pool resource
+    When the Terraform configuration is applied
+    Then the target pool should be configured with appropriate security settings, such as HTTPS load balancing.
+    And the target pool should only allow traffic from authorized sources (e.g., through firewall rules).
+    And the Terraform plan should explicitly show the security settings of the target pool.
+
+
+  Scenario:  Preventing Autoscaler from Using Default Network with Public IP Addresses
+    Given a Terraform configuration for a google_compute_autoscaler resource named "my-autoscaler"
+    And the autoscaler's instance template uses the default network
+    When the Terraform configuration is applied
+    Then the autoscaler should NOT create instances with public IP addresses by default.
+    And the instances should be configured to use internal IP addresses only, unless explicitly specified.
+    And the Terraform plan should clearly indicate the network and IP address configuration of the instances.
+
+
+  Scenario:  Ensuring Autoscaler Configuration is Version Controlled and Reviewed
+    Given a Terraform configuration for a google_compute_autoscaler resource
+    And the configuration is committed to a version control system (e.g., Git)
+    And the configuration changes are reviewed before deployment
+    When the Terraform configuration is applied
+    Then the configuration history should be auditable.
+    And the configuration changes should be reviewed by at least one other engineer.
+    And the Terraform plan should be reviewed before deployment.
+
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Instance Template Configuration
+
+  Scenario: Preventing Publicly Accessible Instances
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the network interface's access config is configured
+    When the Terraform plan is applied
+    Then the instance template's network interface should NOT have a public IP address assigned
+    And the instance template's network interface should NOT have an access config with "natIP" set
+
+
+  Scenario: Enforcing Secure Boot
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the "confidential_instance_config" is not specified
+    When the Terraform plan is applied
+    Then the instance template should have secure boot enabled.
+
+
+  Scenario: Preventing Metadata Access from the Instance
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the metadata settings are configured
+    When the Terraform plan is applied
+    Then the instance template should have metadata access restricted to only the project.
+
+
+  Scenario:  Restricting Instance Metadata Access to Specific Services
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the metadata settings are configured to allow access from specific services
+    When the Terraform plan is applied
+    Then the instance template should only allow metadata access from the specified services.
+    And the instance template should deny metadata access from all other services.
+
+
+  Scenario:  Using a Managed Service Account with appropriate permissions
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And a service account is specified for the instance
+    When the Terraform plan is applied
+    Then the instance template should use a service account with the principle of least privilege.
+    And the service account should only have permissions necessary for the instance's functionality.
+
+
+  Scenario:  Ensuring Disk Encryption
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the disk configuration is specified
+    When the Terraform plan is applied
+    Then all attached disks in the instance template should be encrypted using Google managed encryption keys.
+
+
+  Scenario:  Validating Firewall Rules
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the network interface is associated with a firewall rule
+    When the Terraform plan is applied
+    Then the firewall rules associated with the network interface should only allow necessary traffic.
+    And the firewall rules should explicitly deny all other traffic.
+
+
+  Scenario:  Checking for outdated OS images
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And a specific OS image is specified
+    When the Terraform plan is applied
+    Then the instance template should use a supported and up-to-date OS image.
+    And a warning should be triggered if the image is nearing end-of-life or unsupported.
+
+
+  Scenario:  Using appropriate machine type for resource utilization
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And a machine type is specified
+    When the Terraform plan is applied
+    Then the instance template should use a machine type appropriate for the workload.
+    And the machine type should be optimized for cost and performance.
+
+
+  Scenario:  Preventing unauthorized access to instance metadata
+    Given a Google Compute Instance Template resource "default" is defined using Terraform
+    And the metadata options are configured
+    When the Terraform plan is applied
+    Then the instance template should not expose sensitive information via metadata.
+    And the instance template should have metadata access restricted to authorized users and services.
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Feature: Secure Google Compute Instance Group Manager Configuration
+
+  Scenario: Preventing Unintentional Public IP Assignment
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the instance template specifies a network interface with no specified network or subnetwork
+    When the Terraform configuration is applied
+    Then the created instance group manager should NOT have instances with public IP addresses assigned automatically.
+    And the Terraform plan should explicitly show that no public IP is assigned.
+
+
+  Scenario: Enforcing HTTPS for Instance Group Manager Health Checks
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And a health check is defined with a HTTP protocol
+    When the Terraform configuration is applied
+    Then the created instance group manager's health check should be updated to use HTTPS protocol.
+    And a warning or error should be raised if the health check protocol is not HTTPS.
+
+
+  Scenario: Preventing Unrestricted Instance Group Manager Access
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the instance group manager is not associated with any specific firewall rules
+    When the Terraform configuration is applied
+    Then the created instance group manager should be associated with a firewall rule that restricts access only from authorized networks or IP addresses.
+    And the Terraform plan should explicitly show the applied firewall rules.
+
+
+  Scenario: Ensuring Instance Group Manager Uses Managed Instance Groups
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the `base_instance_name` is defined but `list_managed_instances_results` is not specified.
+    When the Terraform configuration is applied
+    Then the created instance group manager should use managed instance groups.
+    And the Terraform plan should show that `list_managed_instances_results` is set to `PAGELESS`.
+
+
+  Scenario: Preventing Vulnerable Instance Templates
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the instance template uses a deprecated operating system or software version
+    When the Terraform configuration is applied
+    Then the Terraform plan should fail or issue a warning indicating the use of a vulnerable instance template.
+    And recommendations for updating to a secure OS/software version should be provided.
+
+
+  Scenario:  Restricting Instance Group Manager Creation to Specific Projects
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And the project ID is not explicitly defined in the configuration
+    When the Terraform configuration is applied
+    Then the Terraform plan should fail or issue a warning unless the project ID is explicitly defined and restricted to a specific, approved project.
+
+
+  Scenario:  Autohealing Configuration Validation
+    Given a Terraform configuration for a google_compute_instance_group_manager resource named "my-igm"
+    And autohealing is enabled without specifying `initial_delay_sec`
+    When the Terraform configuration is applied
+    Then the Terraform plan should either automatically set a reasonable `initial_delay_sec` value or issue a warning recommending a specific value to prevent immediate restarts.
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Scenario: Preventing unauthorized access via project-level SSH keys
+
+  Given a Google Compute Engine instance is created with project-level SSH keys enabled
+  When a user attempts to access the instance using a project-level SSH key
+  Then access is denied unless the user has appropriate IAM permissions explicitly granted at the instance level.
+
+
+Scenario: Ensuring least privilege access to Compute Engine instances
+
+  Given multiple Compute Engine instances exist within a project, each with different security requirements
+  When a user attempts to access an instance
+  Then access is granted only if the user possesses the minimum necessary IAM roles and permissions specifically assigned to that instance.
+
+
+Scenario: Secure management of SSH keys for Compute Engine instances
+
+  Given a user's access to a Compute Engine instance is revoked
+  When the user attempts to access the instance using their previously associated SSH key
+  Then access is denied, and the SSH key is removed from the instance's metadata.
+
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Scenario: Preventing unauthorized access via project-wide SSH keys
+
+  Given a Google Compute Engine project with multiple VM instances and users with varying access needs
+  When project-wide SSH keys are enabled for all VM instances
+  Then access to all VM instances should be denied, and only users with explicitly granted instance-level permissions via OS Login should be able to connect.
+
+
+Scenario: Ensuring least privilege access to VM instances
+
+  Given a Google Compute Engine project with VM instances requiring different levels of access
+  When a new user is added to the project
+  Then the user should only be granted access to the specific VM instances and with the minimum necessary permissions.
+
+
+Scenario: Secure management of SSH keys for VM instances
+
+  Given a Google Compute Engine project with VM instances using SSH keys for authentication
+  When a user leaves the project
+  Then their associated SSH keys should be automatically removed from all VM instances, preventing further access.
+
+
+Scenario: Detecting and responding to compromised SSH keys
+
+  Given a Google Compute Engine project with VM instances using SSH keys for authentication
+  When a project-level SSH key is compromised
+  Then an alert should be triggered, and access using the compromised key should be immediately revoked.  All affected VM instances should be investigated for potential compromise.
+```
+
+API called successfully! (Response is not JSON)
+```gherkin
+Scenario: Preventing unauthorized access via project-wide SSH keys
+
+  Given a Google Compute Engine project with multiple VM instances and users with varying access needs
+  When project-wide SSH keys are enabled for all VM instances
+  Then access to all VM instances should be denied, and only users with explicitly granted instance-level permissions via OS Login should be able to connect.
+
+
+Scenario: Ensuring least privilege access to VM instances
+
+  Given a Google Compute Engine project with VM instances requiring different levels of access
+  When a new user is added to the project
+  Then the user should only be granted access to the specific VM instances and with only the necessary permissions, adhering to the principle of least privilege.
+
+
+Scenario: Secure management of SSH keys for VM instances
+
+  Given a Google Compute Engine project with VM instances using SSH keys for access
+  When a user leaves the project
+  Then their associated SSH keys should be automatically removed from the metadata of all VM instances, preventing further access.
+
+
+Scenario: Detecting and responding to compromised SSH keys
+
+  Given a Google Compute Engine project with VM instances using SSH keys for access
+  When a project-level SSH key is compromised
+  Then an alert should be triggered, and access using the compromised key should be immediately revoked.  All affected VM instances should be investigated and remediated.
+```
+
+
